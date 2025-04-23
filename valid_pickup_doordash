@@ -1,0 +1,59 @@
+import java.util.*;
+
+public class PickupDeliveryValidator {
+
+    public static boolean isValid(List<String> actions) {
+        Set<String> pickups = new HashSet<>();
+        Set<String> deliveries = new HashSet<>();
+
+        for (String action : actions) {
+            if (action.startsWith("P")) {
+                // Check for duplicate pickup
+                if (pickups.contains(action)) {
+                    return false;
+                }
+                pickups.add(action);
+            } else if (action.startsWith("D")) {
+                String orderId = "P" + action.substring(1); // D1 -> P1
+
+                // Check if corresponding pickup has occurred
+                if (!pickups.contains(orderId)) {
+                    return false;
+                }
+
+                // Check for duplicate delivery
+                if (deliveries.contains(action)) {
+                    return false;
+                }
+
+                deliveries.add(action);
+            } else {
+                // Invalid action format
+                return false;
+            }
+        }
+
+        // All pickups must have matching deliveries
+        return pickups.size() == deliveries.size();
+    }
+
+    public static void main(String[] args) {
+        List<List<String>> testCases = Arrays.asList(
+            Arrays.asList("P1", "P2", "D1", "D2"),       // valid
+            Arrays.asList("P1", "D1", "P2", "D2"),       // valid
+            Arrays.asList("P1", "D2", "D1", "P2"),       // invalid
+            Arrays.asList("P1", "D2"),                   // invalid
+            Arrays.asList("P1", "P2"),                   // invalid
+            Arrays.asList("P1", "D1", "D1"),             // invalid
+            new ArrayList<>(),                           // valid
+            Arrays.asList("P1", "P1", "D1"),             // invalid
+            Arrays.asList("P1", "P1", "D1", "D1"),       // invalid
+            Arrays.asList("P1", "D1", "P1"),             // invalid
+            Arrays.asList("P1", "D1", "P1", "D1")        // invalid
+        );
+
+        for (List<String> testCase : testCases) {
+            System.out.println(testCase + " => " + isValid(testCase));
+        }
+    }
+}
